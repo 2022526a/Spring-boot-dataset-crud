@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<div th:fragment="header">
+  <div class="bg-gray-800 text-white p-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold">Welcome to the App!</h1>
+    <a href="/logout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Logout</a>
+  </div>
+</div>
+<div th:fragment="footer">
+  <footer class="bg-gray-100 text-center p-4 text-gray-500 mt-10">
+    &copy; 2025 My App. All rights reserved.
+  </footer>
+</div>
+<div th:fragment="sidebar">
+  <div class="w-64 bg-gray-200 h-full p-4">
+    <ul class="space-y-2">
+      <li><a href="/" class="block hover:bg-gray-300 p-2 rounded">Home</a></li>
+      <li><a href="/" class="block hover:bg-gray-300 p-2 rounded">Profile</a></li>
+      <li><a href="/" class="block hover:bg-gray-300 p-2 rounded">Settings</a></li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>
