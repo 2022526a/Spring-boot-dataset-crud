@@ -120,4 +120,15 @@ public class AuthController {
                 .getHeader("X-Requested-With");
         return "XMLHttpRequest".equals(requestedWith);
     }
+
+    @PostMapping("/delete/{id}")
+    public String deleteCovidCase(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            covidCaseRepository.deleteById(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Case deleted successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error deleting case");
+        }
+        return "redirect:/welcome";
+    }
 }
