@@ -7,21 +7,40 @@
 </head>
 <body class="flex flex-col min-h-screen">
 
-<!-- Header -->
 <div th:replace="~{fragments :: header}"></div>
 
 <div class="flex flex-1">
-  <!-- Sidebar -->
   <div th:replace="~{fragments :: sidebar}"></div>
 
-  <!-- Main Content -->
-  <main class="flex-1 p-6">
-    <h2 class="text-2xl font-semibold mb-4">Welcome to the App!</h2>
-    <!-- Your page content here -->
+  <main class="flex-1 p-6 bg-white rounded-lg shadow">
+    <h2 class="text-2xl font-semibold mb-6">COVID-19 Cases Report</h2>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white">
+        <thead class="bg-gray-800 text-white">
+        <tr>
+          <th class="py-3 px-4 text-left">Report Date</th>
+          <th class="py-3 px-4 text-left">County</th>
+          <th class="py-3 px-4 text-right">Confirmed Cases</th>
+          <th class="py-3 px-4 text-right">Hospitalized</th>
+          <th class="py-3 px-4 text-right">Deaths</th>
+        </tr>
+        </thead>
+        <tbody class="text-gray-700">
+        <tr th:each="case : ${cases}" class="border-b border-gray-200 hover:bg-gray-50">
+          <td class="py-3 px-4" th:text="${#temporals.format(case.reportDate, 'yyyy-MM-dd')}"></td>
+          <td class="py-3 px-4" th:text="${case.county}"></td>
+          <td class="py-3 px-4 text-right" th:text="${case.confirmedCases}"></td>
+          <td class="py-3 px-4 text-right" th:text="${case.hospitalizedCases != null} ? ${case.hospitalizedCases} : 'N/A'"></td>
+          <td class="py-3 px-4 text-right" th:text="${case.deaths != null} ? ${case.deaths} : 'N/A'"></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
   </main>
+
 </div>
 
-<!-- Footer -->
 <div th:replace="~{fragments :: footer}"></div>
 
 </body>
