@@ -28,7 +28,7 @@ public class SecurityConfig {
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 )
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/register", "/login").permitAll()
+                        .requestMatchers("/register", "/login","/covid-cases/add").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
