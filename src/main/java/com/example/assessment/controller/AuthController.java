@@ -4,6 +4,9 @@ import com.example.assessment.model.CovidCase;
 import com.example.assessment.repository.CovidCaseRepository;
 import com.example.assessment.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,9 +43,23 @@ public class AuthController {
     }
 
     @GetMapping("/welcome")
-    public String welcome(Model model) {
-        List<CovidCase> cases = covidCaseRepository.findAllByOrderByReportDateDesc();
-        model.addAttribute("cases", cases);
+    public String welcome(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model) {
+
+        // Add page sizes list to model
+        model.addAttribute("pageSizes", List.of(5, 10, 20, 50));
+
+        Page<CovidCase> casesPage = covidCaseRepository.findAll(
+                PageRequest.of(page, size, Sort.by("reportDate").descending()));
+
+        model.addAttribute("cases", casesPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("pageSize", size);
+        model.addAttribute("totalPages", casesPage.getTotalPages());
+        model.addAttribute("totalItems", casesPage.getTotalElements());
+
         return "welcome";
     }
 }

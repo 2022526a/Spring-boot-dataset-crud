@@ -36,7 +36,57 @@
         </tr>
         </tbody>
       </table>
+      <!-- Page Size Selector -->
+      <div class="mb-4">
+        <span class="text-sm text-gray-700">Items per page: </span>
+        <select onchange="location = this.value;" class="border rounded p-1">
+          <option th:each="size : ${pageSizes}"
+                  th:value="@{/welcome(page=0, size=${size})}"
+                  th:text="${size}"
+                  th:selected="${size == pageSize}">
+          </option>
+        </select>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div class="flex justify-between items-center mt-4" th:if="${totalPages > 1}">
+        <div>
+        <span class="text-sm text-gray-700">
+            Page <span th:text="${currentPage + 1}"></span> of
+            <span th:text="${totalPages}"></span> -
+            <span th:text="${totalItems}"></span> total records
+        </span>
+        </div>
+
+        <div class="flex space-x-2">
+          <!-- Previous Button -->
+          <a th:href="@{/welcome(page=${currentPage > 0 ? currentPage - 1 : 0}, size=${pageSize})}"
+             class="px-4 py-2 border rounded-lg"
+             th:classappend="${currentPage == 0} ? 'bg-gray-200 cursor-not-allowed' : 'hover:bg-gray-100'">
+            Previous
+          </a>
+
+          <!-- Page Numbers -->
+          <div class="flex space-x-1">
+            <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+               th:href="@{/welcome(page=${i}, size=${pageSize})}"
+               th:text="${i + 1}"
+               class="px-3 py-2 border rounded-lg"
+               th:classappend="${i == currentPage} ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'">
+            </a>
+          </div>
+
+          <!-- Next Button -->
+          <a th:href="@{/welcome(page=${currentPage < totalPages - 1 ? currentPage + 1 : currentPage}, size=${pageSize})}"
+             class="px-4 py-2 border rounded-lg"
+             th:classappend="${currentPage == totalPages - 1} ? 'bg-gray-200 cursor-not-allowed' : 'hover:bg-gray-100'">
+            Next
+          </a>
+        </div>
+      </div>
+
     </div>
+
   </main>
 
 </div>
