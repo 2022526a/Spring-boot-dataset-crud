@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>Welcome</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body class="flex flex-col min-h-screen">
 
@@ -24,6 +26,7 @@
           <th class="py-3 px-4 text-right">Confirmed Cases</th>
           <th class="py-3 px-4 text-right">Hospitalized</th>
           <th class="py-3 px-4 text-right">Deaths</th>
+          <th class="py-3 px-4 text-center">Actions</th>
         </tr>
         </thead>
         <tbody class="text-gray-700">
@@ -33,6 +36,13 @@
           <td class="py-3 px-4 text-right" th:text="${case.confirmedCases}"></td>
           <td class="py-3 px-4 text-right" th:text="${case.hospitalizedCases != null} ? ${case.hospitalizedCases} : 'N/A'"></td>
           <td class="py-3 px-4 text-right" th:text="${case.deaths != null} ? ${case.deaths} : 'N/A'"></td>
+          <td class="py-3 px-4 text-center">
+            <a href="#" th:attr="data-id=${case.id}" class="edit-btn text-blue-500 hover:text-blue-700">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+              </svg>
+            </a>
+          </td>
         </tr>
         </tbody>
       </table>
@@ -93,5 +103,99 @@
 
 <div th:replace="~{fragments :: footer}"></div>
 
+
+
+
+
+<div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+  <div class="bg-white rounded-lg p-6 w-full max-w-md">
+    <h3 class="text-xl font-semibold mb-4">Edit COVID Case</h3>
+    <form id="editForm" th:action="@{/covid-cases/update}" method="post">
+
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+      <input type="hidden" id="editId" name="id"/>
+
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Report Date</label>
+        <input type="date" name="reportDate" id="editReportDate"
+               class="w-full px-3 py-2 border rounded">
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">County</label>
+        <input type="text" name="county" id="editCounty"
+               class="w-full px-3 py-2 border rounded">
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Confirmed Cases</label>
+        <input type="number" name="confirmedCases" id="editConfirmedCases"
+               class="w-full px-3 py-2 border rounded">
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Hospitalized Cases</label>
+        <input type="number" name="hospitalizedCases" id="editHospitalizedCases"
+               class="w-full px-3 py-2 border rounded">
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Deaths</label>
+        <input type="number" name="deaths" id="editDeaths"
+               class="w-full px-3 py-2 border rounded">
+      </div>
+
+      <div class="flex justify-end space-x-2">
+        <button type="button" onclick="closeModal()"
+                class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+          Cancel
+        </button>
+        <button type="submit"
+                class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+
+<script>
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const id = this.getAttribute('data-id');
+            const row = this.closest('tr');
+
+            const reportDate = row.cells[0].textContent;
+            const county = row.cells[1].textContent;
+            const confirmedCases = row.cells[2].textContent;
+            const hospitalizedCases = row.cells[3].textContent === 'N/A' ? '' : row.cells[3].textContent;
+            const deaths = row.cells[4].textContent === 'N/A' ? '' : row.cells[4].textContent;
+
+            document.getElementById('editId').value = id;
+            document.getElementById('editReportDate').value = reportDate;
+            document.getElementById('editCounty').value = county;
+            document.getElementById('editConfirmedCases').value = confirmedCases;
+            document.getElementById('editHospitalizedCases').value = hospitalizedCases;
+            document.getElementById('editDeaths').value = deaths;
+
+            document.getElementById('editModal').classList.remove('hidden');
+        });
+    });
+
+    function closeModal() {
+        document.getElementById('editModal').classList.add('hidden');
+    }
+
+    document.getElementById('editModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+</script>
 </body>
 </html>

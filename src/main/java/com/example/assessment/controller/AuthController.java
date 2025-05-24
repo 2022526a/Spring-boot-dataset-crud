@@ -7,11 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @Controller
@@ -46,9 +46,10 @@ public class AuthController {
     public String welcome(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            Model model) {
+            Model model,
+            CsrfToken csrfToken
+    ) {
 
-        // Add page sizes list to model
         model.addAttribute("pageSizes", List.of(5, 10, 20, 50));
 
         Page<CovidCase> casesPage = covidCaseRepository.findAll(
@@ -59,7 +60,32 @@ public class AuthController {
         model.addAttribute("pageSize", size);
         model.addAttribute("totalPages", casesPage.getTotalPages());
         model.addAttribute("totalItems", casesPage.getTotalElements());
+        model.addAttribute("_csrf", csrfToken);
 
         return "welcome";
+    }
+
+
+
+    @GetMapping("/covid-cases/edit/{id}")
+    @ResponseBody
+    public CovidCase getCaseForEdit(@PathVariable Long id) {
+        return covidCaseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Case not found"));
+    }
+
+    @PostMapping("/covid-cases/update")
+    public String updateCase(@ModelAttribute CovidCase updatedCase) {
+        CovidCase existingCase = covidCaseRepository.findById(updatedCase.getId())
+                .orElseThrow(() -> new RuntimeException("Case not found"));
+
+        existingCase.setReportDate(updatedCase.getReportDate());
+        existingCase.setCounty(updatedCase.getCounty());
+        existingCase.setConfirmedCases(updatedCase.getConfirmedCases());
+        existingCase.setHospitalizedCases(updatedCase.getHospitalizedCases());
+        existingCase.setDeaths(updatedCase.getDeaths());
+
+        covidCaseRepository.save(existingCase);
+        return "redirect:/welcome";
     }
 }
